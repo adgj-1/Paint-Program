@@ -1,0 +1,189 @@
+package tools;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+
+import main.Paint;
+import main.Tool;
+
+public class Saturation extends Tool {
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		Paint.enableRotation = false;
+	}
+
+	@Override
+	public void upEvent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void moveEvent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateEvent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void scrollUp() {
+		BufferedImage img = Paint.img;
+		for (int i = 0; i < img.getWidth(); i++) {
+			for (int j = 0; j < img.getHeight(); j++) {
+				Color pixelColor = new Color(img.getRGB(i, j),true);
+				int r = pixelColor.getRed();
+				int g = pixelColor.getGreen();
+				int b = pixelColor.getBlue();
+				int a = pixelColor.getAlpha();
+				
+				int diff;
+				if (r > g && r > b) {
+					diff = (r - g) + (r - b);
+					
+					r += diff/5;
+					g -= (r-g)/5;
+					b -= (r-b)/5;
+				} else if (g > r && g > b) {
+					diff = (g - r) + (g - b);
+					
+					g += diff/5;
+					r -= (g-r)/5;
+					b -= (g-b)/5;
+				} else if (b > r && b > g) {
+					diff = (b - g) + (b - r);
+					
+					b += diff/5;
+					g -= (b-g)/5;
+					r -= (b-r)/5;
+				} else {
+					if (r == b && r > g) {
+						diff = (r - g);
+						r += diff / 10;
+						b += diff / 10;
+						g -= diff / 5;
+						
+					} else if (r == g && r > b) {
+						diff = (r - b);
+						r += diff / 10;
+						g += diff / 10;
+						b -= diff / 5;
+					} else if (b == g && b > r) {
+						diff = (b - r);
+						b += diff / 10;
+						g += diff / 10;
+						r -= diff / 5;
+					}
+				}
+				
+				
+				if (r > 255) {
+					r = 255;
+				}
+				if (g > 255) {
+					g = 255;
+				}
+				if (b > 255) {
+					b = 255;
+				}
+				
+				if (r < 0) {
+					r = 0;
+				}
+				if (g < 0) {
+					g = 0;
+				}
+				if (b < 0) {
+					b = 0;
+				}
+				img.setRGB(i, j, new Color(r,g,b,a).getRGB());
+			}
+		}
+	}
+	
+	public void scrollDown() {
+		BufferedImage img = Paint.img;
+		for (int i = 0; i < img.getWidth(); i++) {
+			for (int j = 0; j < img.getHeight(); j++) {
+				Color pixelColor = new Color(img.getRGB(i, j),true);
+				int r = pixelColor.getRed();
+				int g = pixelColor.getGreen();
+				int b = pixelColor.getBlue();
+				int a = pixelColor.getAlpha();
+				
+				int diff;
+				if (r > g && r > b) {
+					diff = (r - g) + (r - b);
+					
+					r -= diff/5;
+					g += (r-g)/5;
+					b += (r-b)/5;
+				} else if (g > r && g > b) {
+					diff = (g - r) + (g - b);
+					
+					g -= diff/5;
+					r += (g-r)/5;
+					b += (g-b)/5;
+				} else if (b > r && b > g) {
+					diff = (b - g) + (b - r);
+					
+					b -= diff/5;
+					g += (b-g)/5;
+					r += (b-r)/5;
+				} else {
+					if (r == b && r > g) {
+						diff = (r - g);
+						r -= diff/10;
+						b -= diff/10;
+						g += diff/5;
+						
+					} else if (r == g && r > b) {
+						diff = (r - b);
+						r -= diff/10;
+						g -= diff/10;
+						b += diff/5;
+					} else if (b == g && b > r) {
+						diff = (b - r);
+						b -= diff/10;
+						g -= diff/10;
+						r += diff/5;
+					}
+				}
+				
+				
+				if (r > 255) {
+					r = 255;
+				}
+				if (g > 255) {
+					g = 255;
+				}
+				if (b > 255) {
+					b = 255;
+				}
+				
+				if (r < 0) {
+					r = 0;
+				}
+				if (g < 0) {
+					g = 0;
+				}
+				if (b < 0) {
+					b = 0;
+				}
+				img.setRGB(i, j, new Color(r,g,b,a).getRGB());
+			}
+		}
+	}
+	
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return "Saturation";
+	}
+
+}
