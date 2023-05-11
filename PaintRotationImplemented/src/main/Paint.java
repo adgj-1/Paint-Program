@@ -9,8 +9,13 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JPanel;
+
+import dialog.BrushSelectorMenu;
 import dialog.ErrorMessage;
 import tools.Crop;
+import util.BrushSelector;
+import util.brush.Brush;
 
 public class Paint {
 	
@@ -27,18 +32,22 @@ public class Paint {
 	
 	public static List<Boolean> lVisible = new ArrayList<Boolean>();
 	
+	public static List<JPanel> viewables = new ArrayList<JPanel>();
+	
 	public static int currentLayer = 0;
 	
 	public static int defaultSize = 10;
 	
 	public static int defaultTransparency = 50;
 	
-	public static boolean enableRotation = false;
+	public static boolean enableRotation = true;
 	
 	public static void init() {
 		Main.colorSelected = Color.BLACK;
 		Canvas.alpha = Color.GRAY;
 		ToolManager.loadTools();
+		BrushSelector.getBrushList().add(new Brush(null));
+		BrushSelectorMenu.loadExternalBrush();
 	}
 	
 	public static void start() {
@@ -48,9 +57,13 @@ public class Paint {
 		while (isPlaying) {
 			
 			update();
+			for (JPanel p : viewables) {
+				p.repaint();
+			}
 			Main.rotator.repaint();
 			Main.c.repaint();
 			Main.miniCanvas.repaint();
+			
 			
 			
 			try {
@@ -69,6 +82,7 @@ public class Paint {
 	public static void update() {
 		SelectedColor.updateComponent();
 		Approximation.update();
+		Main.rotator.update();
 		if (uiLayer != null) {
 			UILayer.update();
 		}
@@ -132,6 +146,27 @@ public class Paint {
 		}
 	}
 	
+	/**
+	 * A DrawLine Function That Doesn't Have Border Restriction
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @param l
+	 */
+	public static void drawLine2(int x1, int y1, int x2, int y2, TypeLine l) {
+		int step = hyp(x1 - x2, y1 - y2);
+		double countX = x1;
+		double countY = y1;
+		for (int i = 0; i <= step; i++) {
+			
+			l.doLocationAction((int)countX, (int)countY);
+			
+			countX += (double)(x2 - x1) / step;
+			countY += (double)(y2 - y1) / step;
+		}
+	}
+	
 	public static int hyp(int x, int y) {
 		x *= x;
 		y *= y;
@@ -156,6 +191,7 @@ public class Paint {
 		
 		currentLayer = layers.size() - 1;
 		img = layers.get(currentLayer);
+		Paint.uiLayer = new BufferedImage(Math.max(Paint.img.getWidth(),i.getWidth()), Math.max(Paint.img.getHeight(),i.getHeight()), BufferedImage.TYPE_INT_ARGB);
 		LayerManager.add();
 	}
 	

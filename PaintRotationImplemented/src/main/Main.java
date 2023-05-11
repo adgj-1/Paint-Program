@@ -195,6 +195,9 @@ public class Main {
 		layerButton.addActionListener(l);
 		eMenu.add(layerButton);
 		
+		MenuItem brushButton = new MenuItem("Select Brush");
+		brushButton.addActionListener(l);
+		eMenu.add(brushButton);
 		
 		//Approximation Menu
 		Menu aMenu = new Menu("Approximation");
@@ -244,13 +247,16 @@ public class Main {
 			
 			
 		for (int i = 0; i < Paint.layers.size(); i++) {
+			//button
 			Button b = new Button("Layer" + i);
 			b.setActionCommand("#Layer" + i);
 			b.addActionListener(l);
 			b.setVisible(true);
+			//======
 			gbc.gridx = 0;
 			gbc.gridy = i+1;
 			layerPanel.add(b,gbc);
+			//show/hide button
 			Button b2;
 			if (Paint.lVisible.get(i)) {
 				b2 = new Button("x");
@@ -260,6 +266,7 @@ public class Main {
 			b2.setActionCommand("lVisible" + i);
 			b2.addActionListener(l);
 			b2.setVisible(true);
+			//======
 			gbc.gridx = 1;
 			gbc.gridy = i+1;
 			layerPanel.add(b2,gbc);
@@ -439,6 +446,27 @@ public class Main {
 		Paint.createLayer(Paint.img);
 	}
 	
+	public static BufferedImage getPathImage(String path) {
+		Toolkit t = j.getToolkit();
+		MediaTracker tracker = new MediaTracker(j);
+		java.awt.Image i = t.getImage(path);
+		tracker.addImage(i, 0);
+		try {
+			tracker.waitForAll();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			Paint.throwError("Loading interrupted");
+			e.printStackTrace();
+		}
+		if (i.getHeight(null) == -1 && i.getWidth(null) == -1) {
+			Paint.throwError("Image Doesn't Exist");
+			return null;
+		}
+		BufferedImage res;
+		res = fitSize(toBufferedImage(i), 200,200);
+		return res;
+	}
+	
 	public static void createImage(int sizeX, int sizeY) {
 		Paint.layers = new ArrayList<BufferedImage>();
 		Paint.lVisible = new ArrayList<Boolean>();
@@ -461,6 +489,19 @@ public class Main {
 		if (Paint.img != null) {
 			try {
 				ImageIO.write(Paint.img, "png", new File(path));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			Paint.throwError("No image to save");
+		}
+	}
+	
+	public static void saveImage(String path, BufferedImage img) {
+		if (img != null) {
+			try {
+				ImageIO.write(img, "png", new File(path));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

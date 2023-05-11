@@ -72,6 +72,25 @@ public class Canvas extends JPanel implements MouseMotionListener {
 			g.setColor(Color.CYAN);
 			g2d.drawString("Scale: " + (int)(imageScale * 100) + "%", Main.c.getWidth() - 200, Main.c.getHeight() - 30);
 			g2d.drawString("x: " + Paint.img.getWidth() + "  y: " + Paint.img.getHeight(), Main.c.getWidth() - 100, Main.c.getHeight() - 30);
+			
+		}
+		
+		//Draw drag ui
+		if (MouseEventController.rdrag) {
+			double localCenterX = Main.c.getWidth()/2;
+			double localCenterY = Main.c.getHeight()/2;
+			g2d.setColor(new Color(50,50,50,30));
+			int posX = (int) (localCenterX - Math.min(Main.c.getWidth()*0.8, Main.c.getHeight()*0.8)/2);
+			int posY = (int) (localCenterY - Math.min(Main.c.getWidth()*0.8, Main.c.getHeight()*0.8)/2);
+			int size = (int) Math.min(Main.c.getWidth()*0.8, Main.c.getHeight()*0.8);
+			g2d.fillOval(posX,posY,size,size);
+			double mouseAngle = Rotator.toPolar(rawMouseX - localCenterX, rawMouseY - localCenterY)[0];
+			double[] targetPos = Rotator.toCartesian(Main.rotator.angle, size/2);
+			double[] mousePos = Rotator.toCartesian(mouseAngle, size/2);
+			g2d.setColor(Color.RED);
+			g2d.drawLine((int)localCenterX, (int)localCenterY, (int)(targetPos[0] + localCenterX), (int)(targetPos[1] + localCenterY));
+			g2d.setColor(Color.BLUE);
+			g2d.drawLine((int)localCenterX, (int)localCenterY, (int)(mousePos[0] + localCenterX), (int)(mousePos[1] + localCenterY));
 		}
 	}
 
@@ -96,6 +115,8 @@ public class Canvas extends JPanel implements MouseMotionListener {
 		}
 		if (MouseEventController.drag) {
 			dragImage();
+		} else if (MouseEventController.rdrag) {
+			rotateImage();
 		}
 		rawMouseX = e.getX();
 		rawMouseY = e.getY();
@@ -131,6 +152,16 @@ public class Canvas extends JPanel implements MouseMotionListener {
 	public void dragImage() {
 		imagePosX = MouseEventController.dragImagePositionX + rawMouseX - MouseEventController.dragLandPointX;
 		imagePosY = MouseEventController.dragImagePositionY + rawMouseY - MouseEventController.dragLandPointY;
+	}
+	
+	public void rotateImage() {
+		double localCenterX = Main.c.getWidth()/2;
+		double localCenterY = Main.c.getHeight()/2;
+		double[] originalRot = Rotator.toPolar(MouseEventController.dragLandPointX - localCenterX, MouseEventController.dragLandPointY - localCenterY);
+		double[] newRot = Rotator.toPolar(rawMouseX - localCenterX, rawMouseY - localCenterY);
+		Main.rotator.rotate(MouseEventController.landAngle + (newRot[0] - originalRot[0]));
+//		imagePosX = MouseEventController.dragImagePositionX + rawMouseX - MouseEventController.dragLandPointX;
+//		imagePosY = MouseEventController.dragImagePositionY + rawMouseY - MouseEventController.dragLandPointY;
 	}
 	
 }

@@ -23,11 +23,17 @@ public class Rotator extends JPanel {
 	double rotY;
 	double srotX;
 	double srotY;
+	double rawImagePosX;
+	double rawImagePosY;
+	int currentImageX;
+	int currentImageY;
 	Font font = new Font("Calibri",Font.BOLD,20);
 	public Rotator() {
 		this.addMouseListener(new RotatorMouseListener());
 		this.addMouseMotionListener(new RotatorMouseListener());
 		this.setBounds(this.getX(), this.getY(), 100, 100);
+		currentImageX = Canvas.imagePosX;
+		currentImageY = Canvas.imagePosY;
 	}
 	
 	public void paint(Graphics g) {
@@ -63,26 +69,84 @@ public class Rotator extends JPanel {
 			g.setFont(font);
 			g.drawString("R", (int)posX-5, (int)posY+5);
 		} else {
-			angle = 0;
+			
 			g.setColor(Color.DARK_GRAY);
 			g.fillRect(0, 0, this.getWidth(), this.getHeight());
 			g.setFont(font);
 			g.setColor(Color.RED);
 			g.drawString("Rotation UnAvailable", (int)posX, (int)posY + 50);
 		}
+		
+		
+	}
+	
+	public void update() {
+		if  (!Paint.enableRotation) {
+			angle = 0;
+		}
+		if (currentImageX != Canvas.imagePosX || currentImageY != Canvas.imagePosY) {
+			rawImagePosX = Canvas.imagePosX;
+			rawImagePosY = Canvas.imagePosY;
+			currentImageX = Canvas.imagePosX;
+			currentImageY = Canvas.imagePosY;
+		}
 	}
 	
 	public void input(MouseEvent e) {
 		//System.out.println("tt");
+		double preAngle = angle;// Record previous angle
+		
 		double run = e.getX() - posX;
 		double rise = e.getY() - posY;
+		
 		if (Math.sqrt(run * run + rise * rise) < 25) {
 			angle = 0;
 		} else {
 			angle = Math.atan2(rise, run) + Math.PI/2;
 		}
+		
+		localRelocation(preAngle, angle);
 	}
 	
+	public void rotate(double a) {
+		double preAngle = angle;
+		angle = a;
+		localRelocation(preAngle,angle);
+	}
+	
+	private void localRelocation(double preAngle, double angle) {
+		double imgCenterX = Canvas.imagePosX + Paint.uiLayer.getWidth() * Canvas.imageScale/2;
+		double imgCenterY = Canvas.imagePosY + Paint.uiLayer.getHeight() * Canvas.imageScale/2;
+		
+		double localCenterX = Main.c.getWidth()/2;
+		double localCenterY = Main.c.getHeight()/2;
+		
+		double x = imgCenterX - localCenterX;
+		double y = imgCenterY - localCenterY;
+		double[] oldPolar = toPolar(x,y);
+		double[] newPos = toCartesian(oldPolar[0] + (angle-preAngle),oldPolar[1]);
+		double moveX = (newPos[0] - x);
+		double moveY = (newPos[1] - y);
+		rawImagePosX += moveX;
+		rawImagePosY += moveY;
+		
+		Canvas.imagePosX = (int) rawImagePosX;
+		Canvas.imagePosY = (int) rawImagePosY;
+		currentImageX = Canvas.imagePosX;
+		currentImageY = Canvas.imagePosY;
+	}
+	
+	public static double[] toCartesian(double angle, double radius) {
+		double x = Math.cos(angle) * radius;
+		double y = Math.sin(angle) * radius;
+		return new double[] {x,y};
+	}
+	
+	public static double[] toPolar(double x, double y) {
+		double angle = Math.atan2(y, x);
+		double radius = Math.sqrt(x * x + y * y);
+		return new double[] {angle, radius};
+	}
 	
 	public int[] rotatedPos(int mouseX, int mouseY) {
 		int[] res = new int[2];

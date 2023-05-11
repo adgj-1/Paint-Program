@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import dialog.ApproximationMenu;
+import dialog.BrushSelectorMenu;
 import dialog.ColorMenu;
 import dialog.ImportMenu;
 import dialog.LoadMenu;
@@ -84,6 +85,12 @@ public class MenuListener implements ActionListener {
 		
 		case "Screen Capture": {
 			Paint.screenCapture();
+			break;
+		}
+		
+		case "Select Brush": {
+			BrushSelectorMenu m = new BrushSelectorMenu(Main.j);
+			m.setVisible(true);
 			break;
 		}
 		

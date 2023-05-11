@@ -9,6 +9,7 @@ import tools.Contrast;
 import tools.Crop;
 import tools.Dropper;
 import tools.Eraser;
+import tools.Filter;
 import tools.Highlighter;
 import tools.Line;
 import tools.MixerBrush;
@@ -37,6 +38,7 @@ public class ToolManager {
 		toolList.add(new Line());
 		toolList.add(new SpriteSheetGenerator());
 		toolList.add(new Crop());
+		toolList.add(new Filter());
 	}
 	
 	public static Menu toolMenu() {

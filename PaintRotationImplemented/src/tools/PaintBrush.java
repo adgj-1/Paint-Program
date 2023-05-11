@@ -1,12 +1,15 @@
 package tools;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 import main.Canvas;
+import main.LayerManager;
 import main.Main;
 import main.Paint;
 import main.Tool;
 import main.TypeLine;
+import util.BrushSelector;
 
 public class PaintBrush extends Tool implements TypeLine {
 	
@@ -114,6 +117,30 @@ public class PaintBrush extends Tool implements TypeLine {
 	
 	@Override
 	public void doLocationAction(int x, int y) {
+		
+		if (BrushSelector.getCurrentBrush().getShape() == null) {
+			defaultBrush(x,y);
+		} else {
+			BufferedImage shape = BrushSelector.getCurrentBrush().getShape();
+			int fillColor;
+			int mid = size/2;
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
+					int pX = (int) (x + i - mid);
+					int pY = (int) (y + j - mid);
+					if (pX >= 0 && pX < Paint.img.getWidth() && pY >= 0 && pY < Paint.img.getHeight()) {
+						int fillRGB = setTransparency(Main.colorSelected.getRGB(),new Color(shape.getRGB(i * 200/size, j * 200/size), true).getAlpha());
+						fillColor = LayerManager.stackColor(Paint.img.getRGB(pX, pY), fillRGB);
+					
+						Paint.img.setRGB((int)(pX),(int) (pY) , fillColor);
+					}
+				}
+			}
+		}
+		
+	}
+	
+	public void defaultBrush(int x, int y) {
 		int mid = size/2;
 		int fillColor;
 		for (int i = 0; i <= size; i++) {
@@ -131,8 +158,6 @@ public class PaintBrush extends Tool implements TypeLine {
 				}
 			}
 		}
-		
-		
 	}
 	
 	public static void setSize(int s) {
