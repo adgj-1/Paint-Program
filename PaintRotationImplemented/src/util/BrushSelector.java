@@ -49,6 +49,9 @@ public class BrushSelector extends JPanel implements MouseListener {
 	}
 	
 	public static Brush getCurrentBrush() {
+		if (brushSelected == null) {
+			brushSelected = brushList.get(0); // Set to default brush
+		}
 		return brushSelected;
 	}
 	

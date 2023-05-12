@@ -1,11 +1,14 @@
 package tools;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.Canvas;
 import main.Main;
 import main.Paint;
 import main.Tool;
+import util.Vector2;
 
 public class PaintBucket extends Tool {
 	
@@ -20,19 +23,17 @@ public class PaintBucket extends Tool {
 		super.clickEvent();
 		// TODO Auto-generated method stub
 		
-		int oldRGB = Paint.img.getRGB(Canvas.mouseX, Canvas.mouseX);
+		int oldRGB = Paint.img.getRGB(Canvas.mouseX, Canvas.mouseY);
 		int newRGB = Main.colorSelected.getRGB();
 		try {
 		//fill(Canvas.mouseX,Canvas.mouseY,oldRGB,newRGB,Canvas.mouseX,Canvas.mouseY);
-		loopFill(Canvas.mouseX,Canvas.mouseY,new Color(oldRGB),new Color(newRGB), Canvas.mouseX, Canvas.mouseY);
+		//loopFill(Canvas.mouseX,Canvas.mouseY,new Color(oldRGB),new Color(newRGB), Canvas.mouseX, Canvas.mouseY);
+		tailRecursiveFill(Canvas.mouseX,Canvas.mouseY,oldRGB,newRGB);
 		} catch (StackOverflowError e) {
 			Paint.undo();
 			Paint.throwError(e.toString());
 		}
 		
-//		Color oldRGB = new Color(Paint.img.getRGB(Canvas.mouseX, Canvas.mouseY),true);
-//		Color newRGB = Main.colorSelected;
-//		loopFill(Canvas.mouseX,Canvas.mouseY,oldRGB,newRGB);
 	}
 
 	public void upEvent() {
@@ -54,6 +55,43 @@ public class PaintBucket extends Tool {
 		return "PaintBucket";
 	}
 	
+	private void tailRecursiveFill(int x, int y, int originalRGB, int newRGB) {
+		List<Vector2> frontier = new ArrayList<Vector2>();
+		frontier.add(new Vector2(x,y));
+		
+		while (!frontier.isEmpty()) {
+			Vector2 loc = frontier.remove(0);
+			int xi = loc.getX();
+			int yi = loc.getY();
+			
+			if (originalRGB != newRGB && Paint.img.getRGB(xi, yi) == originalRGB) {
+				
+				Paint.img.setRGB(xi, yi, newRGB);
+				
+				if (xi > 0) {
+					frontier.add(new Vector2(xi-1, yi));
+				}
+				
+				if (xi < Paint.img.getWidth() - 1) {
+					frontier.add(new Vector2(xi+1, yi));
+				}
+				
+				if (yi > 0) {
+					frontier.add(new Vector2(xi, yi-1));
+				}
+				
+				
+				if (yi < Paint.img.getHeight() - 1) {
+					frontier.add(new Vector2(xi, yi+1));
+				}
+			}
+			
+		}
+	}
+	
+	/*
+	 * Deprecated, kept for future references
+	 */
 	@SuppressWarnings("unused")
 	private void fill(int x, int y, int originalRGB, int newRGB, int oX, int oY) {
 		if (originalRGB != newRGB && Paint.img.getRGB(x, y) == originalRGB) {
@@ -78,9 +116,12 @@ public class PaintBucket extends Tool {
 				fill(x, y + 1, originalRGB,newRGB, oX,oY);
 			}
 		}
-		
 	}
 	
+	/*
+	 * Deprecated, kept for future references
+	 */
+	@SuppressWarnings("unused")
 	private void loopFill(int x, int y, Color originalRGB, Color newRGB,int oX, int oY) {
 		boolean blocked;
 		while (true) {
